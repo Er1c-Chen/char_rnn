@@ -21,7 +21,8 @@ def pick_top_n(preds, top_n=5):
     return c
 
 # 读数据
-file_path = './/poetry.txt'
+# file_path = './/poetry.txt'
+file_path = './/jaychou_lyrics.txt'
 # file_path = 'D:\\myproject\\dataset\\corpus\\詩經.txt'
 with open(file_path, 'r', encoding='utf8') as f:
     corpus = f.read()
@@ -66,13 +67,14 @@ train_set = TextDataset(arr)
 batch_size = 128
 epochs = 200
 num_classes = convert.vocab_size
+print(num_classes)
 embed_dim = num_classes
 hidden_size = 512
 num_layers = 2
 dropout = 0.5
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('running on', device)
-fea_type = 'one_hot'  # 'embed' or 'one_hot'
+fea_type = 'embed'  # 'embed' or 'one_hot'
 rnn_type = 'RNN'  # 'RNN' or 'LSTM' or 'GRU'
 train_data = DataLoader(train_set, batch_size, shuffle=True)
 model = CharRNN(num_classes, embed_dim, hidden_size, num_layers, dropout, device,
@@ -113,8 +115,8 @@ for e in range(epochs):
     """
     # pdb.set_trace()
     with torch.no_grad():
-        begin = '蒹葭苍苍'
-        text_len = 30
+        begin = '听妈妈的话'
+        text_len = 24
         model = model.eval()
         samples = [convert.word_to_int(c) for c in begin]
         input_txt = torch.LongTensor(samples)[None].to(device)
@@ -124,15 +126,16 @@ for e in range(epochs):
         for i in range(text_len):
             out, init_state = model(model_input, init_state)
             # pdb.set_trace()
-            pred = pick_top_n(out, top_n=5)
+            pred = pick_top_n(out, top_n=8)
             # pred = out.argmax(dim=1).item()
             result.append(pred[0])
         text = convert.arr_to_text(result)
         text = text.replace('<UNK>', ' ')
-        print('Generate text is: {}'.format(text))
+        # text = convert.poetry(text)
+        print('Generate text is: \n{}'.format(text))
     model.train()
 
-# pdb.set_trace()
+
 plt.figure()
 plt.plot(losses)
 plt.show()

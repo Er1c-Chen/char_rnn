@@ -9,7 +9,8 @@ class TextConverter(object):
                 corpus: 语料库
                 max_vocab: 最大的单词数量
         """
-        corpus = corpus.replace('\n', ' ').replace('\r', ' ').replace('，', ' ').replace('。', ' ').replace('《', ' ').replace('》', ' ')
+        corpus = corpus.replace('\n', ' ').replace('\r', ' ').replace('，', ' ').replace('。', ' ').replace('《', ' ')\
+            .replace('》', ' ').replace(',', ' ')
         # 去掉重复字符
         vocab = set(corpus)
 
@@ -67,3 +68,10 @@ class TextConverter(object):
             words.append(self.int_to_word(index))
         return "".join(words)
 
+    def poetry(self, text):
+        t = []
+        textwnospace = text.replace(' ', '')
+        for i in range(4):
+            t.append(textwnospace[5*i:5*(i+1)])
+        res = '{},{}。\n{},{}。'.format(t[0], t[1], t[2], t[3])
+        return res
