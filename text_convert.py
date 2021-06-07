@@ -73,5 +73,5 @@ class TextConverter(object):
         textwnospace = text.replace(' ', '')
         for i in range(4):
             t.append(textwnospace[5*i:5*(i+1)])
-        res = '{},{}。\n{},{}。'.format(t[0], t[1], t[2], t[3])
+        res = '{}，{}。\n{}，{}。'.format(t[0], t[1], t[2], t[3])
         return res

@@ -10,7 +10,10 @@ from my_rnn import CharRNN
 from torchvision import transforms
 import matplotlib.pyplot as plt
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
+
 
 def pick_top_n(preds, top_n=5):
     top_pred_prob, top_pred_label = torch.topk(preds, top_n, 1)
@@ -19,6 +22,7 @@ def pick_top_n(preds, top_n=5):
     top_pred_label = top_pred_label.squeeze(0).cpu().numpy()
     c = np.random.choice(top_pred_label, size=1, p=top_pred_prob)
     return c
+
 
 # 读数据
 # file_path = './/poetry.txt'
@@ -45,9 +49,9 @@ convert = TextConverter(corpus, max_vocab=10000)
 n_step = 20
 
 # 总的序列个数
-num_seq = int(len(corpus) / n_step) # 63282/20=3164
+num_seq = int(len(corpus) / n_step)  # 63282/20=3164
 # 去掉最后不足一个序列长度的部分
-text = corpus[:num_seq*n_step]  #63280
+text = corpus[:num_seq * n_step]  # 63280
 
 # 接着我们将序列中所有的文字转换成数字表示，重新排列成 (num_seq x n_step) 的矩阵
 arr = convert.text_to_arr(text)
@@ -74,8 +78,8 @@ num_layers = 2
 dropout = 0.5
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('running on', device)
-fea_type = 'embed'  # 'embed' or 'one_hot'
-rnn_type = 'RNN'  # 'RNN' or 'LSTM' or 'GRU'
+fea_type = 'one_hot'  # 'embed' or 'one_hot'
+# for ind, rnn_type in enumerate(['RNN', 'LSTM', 'GRU']):  # 'RNN' or 'LSTM' or 'GRU'
 train_data = DataLoader(train_set, batch_size, shuffle=True)
 model = CharRNN(num_classes, embed_dim, hidden_size, num_layers, dropout, device,
                 fea_type=fea_type, rnn_type=rnn_type).to(device)
@@ -83,7 +87,7 @@ model = model.train()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-losses = []
+# losses = [[], [], []]
 for e in range(epochs):
     train_loss = 0
     for data in train_data:
@@ -105,8 +109,9 @@ for e in range(epochs):
         optimizer.step()
 
         train_loss += loss.item()
-    print('epoch: {}, loss is: {:.3f}, perplexity is: {:.3f}'.format(e+1, train_loss, np.exp(train_loss/len(train_data))))
-    losses.append(train_loss)
+    print('epoch: {}, loss is: {:.3f}, perplexity is: {:.3f}'.format(e + 1, train_loss,
+                                                                     np.exp(train_loss / len(train_data))))
+    # losses[ind].append( np.exp(train_loss / len(train_data)))
 
     """
     生成文本
@@ -132,10 +137,14 @@ for e in range(epochs):
         text = convert.arr_to_text(result)
         text = text.replace('<UNK>', ' ')
         # text = convert.poetry(text)
-        print('Generate text is: \n{}'.format(text))
+        print('Generated text is: \n{}'.format(text))
     model.train()
 
-
-plt.figure()
-plt.plot(losses)
-plt.show()
+# plt.figure()
+# plt.plot(losses[0])
+# plt.plot(losses[1])
+# plt.plot(losses[2])
+# plt.xlabel('epoch')
+# plt.ylabel('perplexity')
+# plt.legend(['RNN', 'LSTM', 'GRU'])
+# plt.show()
